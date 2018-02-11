@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 /**
  * Note that the order of the Markov model would be typically set via a constructor
- *
  * @param <Type> should be String or WordGram
  */
 
@@ -19,11 +18,9 @@ public interface MarkovInterface<Type> {
 	/**
 	 * Get randomly generated text based on the training text
 	 * and order.
-	 * @param length is the number of characters or words generated, this is a maximum
-	 * since if EOS encountered possibly fewer items than length will be generated
 	 * @return randomly generated text 
 	 */
-	public String getRandomText(int length);
+	public String getRandomText();
 	
 	/**
 	 * Really a helper method, but must be public to be part of interface. Used
@@ -34,17 +31,4 @@ public interface MarkovInterface<Type> {
 	 * if <Type> is String and Strings if <Type> is WordGram
 	 */
 	public ArrayList<String> getFollows(Type key);
-	
-	/**
-	 * returns the order of this Markov Model, typically set at construction 
-	 * @return the order of this model
-	 */
-	public int getOrder();
-	
-	/**
-	 * Sets the seed and initializes the random 
-	 * number generator
-	 * @param seed initial seed for java.util.Random
-	 */
-	public void setSeed(long seed);
 }

@@ -8,20 +8,17 @@ public class WordMarkovModel implements MarkovInterface<WordGram> {
 	Map<WordGram,ArrayList<String>> myMap;
 	protected Random myRandom;
 	protected int myOrder;
-	protected static String PSEUDO_EOS = "";
-	protected static long RANDOM_SEED = 1234;
 	
 	public WordMarkovModel(int order){
 		myOrder = order;
 		myMap = new HashMap<WordGram,ArrayList<String>>();
-		myRandom = new Random(RANDOM_SEED);
+		myRandom = new Random();
 	}
 
-	
 	@Override
 	public void setTraining(String text){
 		myWords = text.split("\\s+");
-		//myMap.clear();
+		myMap.clear();
 		
 		int ind = 0;
 		WordGram gram = new WordGram(myWords,0,myOrder);
@@ -39,18 +36,9 @@ public class WordMarkovModel implements MarkovInterface<WordGram> {
 			gram = gram.shiftAdd(myWords[ind+myOrder]);
 			ind += 1;
 		}
-		
-		if (myMap.containsKey(gram)) {
-			myMap.get(gram).add(PSEUDO_EOS);
-		}
-		
-		if (!myMap.containsKey(gram)) {
-			myMap.put(gram, new ArrayList<String>());
-			myMap.get(gram).add(PSEUDO_EOS);
-		}
 	}
 
-	
+	@Override
 	public ArrayList<String> getFollows(WordGram key){
 		ArrayList<String> follows = myMap.get(key);
 		if (follows == null) {
@@ -59,39 +47,29 @@ public class WordMarkovModel implements MarkovInterface<WordGram> {
 		return follows;
 	}
 	
-
-	public String getRandomText(int length){
+	@Override
+	public String getRandomText(){
 		ArrayList<String> sb = new ArrayList<>();
 		int index = myRandom.nextInt(myWords.length - myOrder);
 		WordGram current = new WordGram(myWords,index,myOrder);
 		
+		int charCt = current.toString().length()+1;
 		sb.add(current.toString());
-		for(int k=0; k < length-myOrder; k++){
+		
+		while (true) {
 			ArrayList<String> follows = getFollows(current);
-			if (follows.size() == 0){
-				break;
-			}
+			if (follows.size() == 0) break;
 			index = myRandom.nextInt(follows.size());
 			
 			String nextItem = follows.get(index);
-			if (nextItem.equals(PSEUDO_EOS)) {
-				//System.out.println("PSEUDO");
-				break;
-			}
+			
+			charCt += nextItem.length() + 1;
+			if (charCt>281) break; // exceeds maximum Tweet character count
+			
 			sb.add(nextItem);
-			current = current.shiftAdd(nextItem); //current.substring(1)+ nextItem;
+			current = current.shiftAdd(nextItem);
 		}
+		
 		return String.join(" ", sb);
-	}
-	
-	
-	@Override
-	public int getOrder() {
-		return myOrder;
-	}
-	
-	@Override
-	public void setSeed(long seed) {
-		myRandom.setSeed(seed);
 	}
 }

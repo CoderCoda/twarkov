@@ -1,24 +1,29 @@
 package twarkov;
 
+import java.util.*;
 import twitter4j.*;
 
 public class WordMarkovDriver {
+	
 	public static void main(String[] args) throws TwitterException {
-		String test = "neiltyson";
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter a Twitter username: ");
+		String input = sc.nextLine().trim();
 		
-		TwitterAPI trainer = new TwitterAPI(test);
+		TwitterAPI trainer = new TwitterAPI(input);
 		String text = trainer.getTimeline();
 		
 		MarkovInterface<WordGram> markov = new WordMarkovModel(2);
 		markov.setTraining(text);
-		String random = markov.getRandomText(50);
+		String random = markov.getRandomText();
+		System.out.println('@' + input + " would tweet:\n");
 		printNicely(random,60);
+		sc.close();
 	}
 
 	private static void printNicely(String random, int screenWidth) {
 		String[] words = random.split("\\s+");
 		int psize = 0;
-		System.out.println("----------------------------------");
 		for(int k=0; k < words.length; k++){
 			System.out.print(words[k]+ " ");
 			psize += words[k].length() + 1;
@@ -27,6 +32,5 @@ public class WordMarkovDriver {
 				psize = 0;
 			}
 		}
-		System.out.println("\n----------------------------------");
 	}
 }
